@@ -31,6 +31,25 @@ body {
   min-height: 100vh;
 }
 
+table {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  border: 1px solid #10B981;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+table,
+tr,
+th,
+td {
+  border: 1px solid #10B981;
+}
+
+td:has(button) {
+  width: 150px;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -43,7 +62,7 @@ li {
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 0.3em 0.9em;
   margin: 10px;
   font-size: 1em;
   font-weight: 500;
@@ -57,8 +76,9 @@ button {
 }
 
 button:hover {
+  transition: 0.75s;
   border-color: #646cff;
-  background-color: #121d27;
+  background-color: #400745;
 }
 
 button:focus,

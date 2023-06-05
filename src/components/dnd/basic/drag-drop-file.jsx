@@ -20,7 +20,7 @@ export default function DragDropFile() {
   }
 
   return (
-    <>
+    <div className='container'>
       <div className='drop-container' onDragOver={handleDragOver} onDrop={handleDrop}>
         <h1>Drag and drop files</h1>
         <h1>Or</h1>
@@ -40,6 +40,6 @@ export default function DragDropFile() {
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 }

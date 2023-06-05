@@ -4,14 +4,17 @@
 /* eslint-disable import/no-unresolved */
 import { useDropzone } from 'react-dropzone'
 import { useCallback, useEffect, useState } from 'react'
-import './basic-dropzone.styles.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
+import './basic-dropzone.styles.css'
 
-export default function BasicDropzone({ className }) {
+export default function BasicDropzone({ className, ...props }) {
   const [files, setFiles] = useState([])
+  const [rejected, setRejected] = useState([])
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const { uploadConfig } = props
+
+  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     if (acceptedFiles?.length) {
       setFiles((previousFile) => [
         ...previousFile,
@@ -25,10 +28,8 @@ export default function BasicDropzone({ className }) {
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: {
-      'image/*': []
-    },
-    maxSize: 1024 * 1000,
+    accept: uploadConfig.accept,
+    maxSize: uploadConfig.maxSize,
     onDrop
   })
 
@@ -37,8 +38,8 @@ export default function BasicDropzone({ className }) {
     return () => files.forEach((file) => URL.revokeObjectURL(file.preview))
   }, [files])
 
-  const removeFile = (name) => {
-    setFiles((files) => files.filter((file) => file.name !== name))
+  const removeFile = (index) => {
+    setFiles(files.filter((_, i) => i !== index))
   }
 
   const removeAll = () => {
@@ -46,8 +47,8 @@ export default function BasicDropzone({ className }) {
     setRejected([])
   }
 
-  const removeRejected = (name) => {
-    setRejected((files) => files.filter(({ file }) => file.name !== name))
+  const removeRejected = (index) => {
+    setRejected(files.filter((_, i) => i !== index))
   }
 
   const handleSubmit = async (e) => {
@@ -64,26 +65,28 @@ export default function BasicDropzone({ className }) {
         </div>
       </section>
       <section className='preview-container'>
-        <div className='preview-action'>
-          <button className='btn-remove' onClick={removeAll}>
-            Remove All
-          </button>
-          <button className='btn-submit' type='submit'>
-            Upload
-          </button>
-        </div>
-        {files.length ? <h2 className='preview-title'>Preview</h2> : null}
+        {files.length ? (
+          <>
+            <div className='preview-action'>
+              <button className='btn-remove' onClick={removeAll}>
+                Remove All
+              </button>
+              <button className='btn-submit' type='submit'>
+                Upload
+              </button>
+            </div>
+            <h2 className='preview-title'>Preview</h2>{' '}
+          </>
+        ) : null}
         <div className='list-file-container'>
-          {files.map((file) => (
-            <>
-              <div key={file.path} className='file-item'>
-                <img src={file.preview} alt='' width={100} height={100} />
-                <button className='btn-close'>
-                  <FontAwesomeIcon icon={faXmark} />
-                </button>
-                {/* <p className='file-name'>{file.name}</p> */}
-              </div>
-            </>
+          {files.map((file, idx) => (
+            <div key={idx} className='file-item'>
+              <img src={file.preview} alt='' width={100} height={100} />
+              <button className='btn-close' onClick={() => removeFile(idx)}>
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+              {/* <p className='file-name'>{file.name}</p> */}
+            </div>
           ))}
         </div>
       </section>
