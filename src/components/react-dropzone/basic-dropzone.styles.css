@@ -1,0 +1,100 @@
+.container {
+	background-color: #fff;
+	border-radius: 20px;
+	box-shadow: rgba(149, 157, 165, 0.2);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 1.5rem;
+}
+
+.dropzone-container {
+	display: flex;
+	flex-direction: row;
+	height: 100px;
+	border: 4px dashed rgb(117, 112, 112);
+	padding: 20px;
+}
+
+.preview-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	margin-top: 1rem;
+}
+
+.preview-action {
+	display: flex;
+	gap: 2.5rem;
+}
+
+.preview-title {
+	font-weight: 600;
+}
+
+.btn-remove {}
+
+.btn-submit {}
+
+
+.upload-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 20rem;
+}
+
+.upload-icon {
+	width: 2.25rem;
+	height: 2.25rem;
+}
+
+.list-file-container {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 2.5rem;
+	width: 40rem;
+	align-content: center;
+	padding: 6px;
+}
+
+.file-item {
+	position: relative;
+	height: 8rem;
+}
+
+.file-item>img {
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+	border-radius: 0.375rem;
+}
+
+.btn-close {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	border-width: 1px;
+	border-radius: 9999px;
+	border-color: rgb(248 113 113);
+	background-color: rgb(248 113 113);
+	width: 1.5rem;
+	height: 1.5rem;
+	top: -1.25rem;
+	right: -1.25rem;
+	padding: 1px;
+}
+
+.btn-close>svg {
+	width: 1rem;
+	height: 1rem;
+	fill: red;
+}
+
+.btn-close:hover {
+	background-color: rgb(76, 30, 64);
+}
