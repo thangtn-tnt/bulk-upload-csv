@@ -1,48 +1,18 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-/* eslint-disable import/no-unresolved */
-import { useEffect, useMemo, useState } from 'react'
-import ReactTable from './table/react-table/react-table'
-import dataHeader from '~/resources/csv-header/data-header'
-import dataJson from '~/data/data.dummy.json'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
+import BasicDropzone from '~/components/dnd/react-dropzone/basic-dropzone'
 
-export default function Data() {
-  const [data, setData] = useState([])
-
-  const fetchData = async () => {
-    //write code to fetch your data from api here
-    setData(dataJson)
+export default function Index() {
+  const uploadConfig = {
+    accept: {
+      'text/csv': ['.csv']
+    },
+    maxFiles: 1,
+    multiple: false
   }
-
-  const tableHooks = (hooks) => {
-    hooks.visibleColumns.push((columns) => [
-      ...columns,
-      {
-        id: 'Action',
-        Header: 'Action',
-        Cell: ({ row }) => (
-          <>
-            <button className='btn btn-edit' onClick={() => alert('Editing: ' + row.original.id)}>
-              <FontAwesomeIcon className='close-icon' icon={faPenToSquare} />
-            </button>
-            <button className='btn btn-close' onClick={() => alert('Removing: ' + row.original.id)}>
-              <FontAwesomeIcon className='close-icon' icon={faXmark} />
-            </button>
-          </>
-        )
-      }
-    ])
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   return (
-    <div className='container'>
-      <ReactTable name='Data' columns={dataHeader} data={data} tableHooks={tableHooks} />
-    </div>
+    <BasicDropzone className='dropzone-container' uploadConfig={uploadConfig} />
+    // <div className='container'>
+    //   <ReactTable name='Data' columns={dataHeader} data={data} tableHooks={tableHooks} />
+    // </div>
   )
 }

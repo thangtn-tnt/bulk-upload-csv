@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-// eslint-disable-next-line import/no-unresolved
 import { useRef, useState } from 'react'
 import './drag-drop-file.styles.css'
 export default function DragDropFile() {

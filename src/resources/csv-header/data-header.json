@@ -1,18 +1,6 @@
 [
   {
-    "Header": "Name",
+    "Header": "name",
     "accessor": "name"
-  },
-  {
-    "Header": "Service Image",
-    "accessor": "serviceImg"
-  },
-  {
-    "Header": "Description",
-    "accessor": "description"
-  },
-  {
-    "Header": "Price",
-    "accessor": "price"
   }
 ]

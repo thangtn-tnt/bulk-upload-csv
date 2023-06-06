@@ -1,35 +1,36 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable import/no-unresolved */
 import { useDropzone } from 'react-dropzone'
 import { useCallback, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faCloudArrowUp, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
+import { utils, read } from 'xlsx'
+import PreviewImages from '~/components/preview/preview-images'
+import ReactTable from '~/components/table/react-table/react-table'
+import headerConfig from '~/resources/csv-header/data-header.json'
 import './basic-dropzone.styles.css'
 
 export default function BasicDropzone({ className, ...props }) {
   const [files, setFiles] = useState([])
-  const [rejected, setRejected] = useState([])
+  const [csvData, setCsvData] = useState(null)
 
   const { uploadConfig } = props
 
-  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
-    if (acceptedFiles?.length) {
-      setFiles((previousFile) => [
-        ...previousFile,
-        ...acceptedFiles.map((file) => Object.assign(file, { preview: URL.createObjectURL(file) }))
-      ])
-    }
-
-    if (rejectedFiles?.length) {
-      setRejected((previousFiles) => [...previousFiles, ...rejectedFiles])
-    }
+  const onDrop = useCallback((acceptedFiles) => {
+    acceptedFiles.forEach((file) => {
+      if (file.type.startsWith('image/')) {
+        setFiles((previousFiles) => [
+          ...previousFiles,
+          ...acceptedFiles.map((file) => Object.assign(file, { preview: URL.createObjectURL(file) }))
+        ])
+      } else if (file.type === 'text/csv') {
+        processCsvFile(file)
+      } else {
+        console.log('Invalid file type:', file.type)
+      }
+    })
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: uploadConfig.accept,
-    maxSize: uploadConfig.maxSize,
+    ...uploadConfig,
     onDrop
   })
 
@@ -39,57 +40,67 @@ export default function BasicDropzone({ className, ...props }) {
   }, [files])
 
   const removeFile = (index) => {
-    setFiles(files.filter((_, i) => i !== index))
+    setFiles((previousFiles) => previousFiles.filter((_, i) => i !== index))
   }
 
   const removeAll = () => {
     setFiles([])
-    setRejected([])
-  }
-
-  const removeRejected = (index) => {
-    setRejected(files.filter((_, i) => i !== index))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
   }
 
-  return (
-    <form onSubmit={handleSubmit} className='container'>
-      <section {...getRootProps({ className: className })}>
-        <input {...getInputProps()} />
-        <div className='upload-container'>
-          <FontAwesomeIcon className='upload-icon' icon={faCloudArrowUp} />
-          {isDragActive ? <p>Drop the files here ...</p> : <p>Drag & drop files here, or click to select files</p>}
-        </div>
-      </section>
-      <section className='preview-container'>
-        {files.length ? (
+  const processCsvFile = useCallback((file) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const binaryData = e.target.result
+      const workbook = read(binaryData, { type: 'binary' })
+      const sheetName = workbook.SheetNames[0]
+      const worksheet = workbook.Sheets[sheetName]
+      const jsonData = utils.sheet_to_json(worksheet)
+
+      console.log(jsonData)
+
+      setCsvData(jsonData)
+    }
+    reader.readAsBinaryString(file)
+  }, [])
+
+  const tableHooks = (hooks) => {
+    hooks.visibleColumns.push((columns) => [
+      ...columns,
+      {
+        id: 'Action',
+        Header: 'Action',
+        Cell: ({ row }) => (
           <>
-            <div className='preview-action'>
-              <button className='btn-remove' onClick={removeAll}>
-                Remove All
-              </button>
-              <button className='btn-submit' type='submit'>
-                Upload
-              </button>
-            </div>
-            <h2 className='preview-title'>Preview</h2>{' '}
+            <button className='btn btn-edit' onClick={() => alert('Editing: ' + row.original.id)}>
+              <FontAwesomeIcon className='close-icon' icon={faPenToSquare} />
+            </button>
+            <button className='btn btn-close' onClick={() => alert('Removing: ' + row.original.id)}>
+              <FontAwesomeIcon className='close-icon' icon={faXmark} />
+            </button>
           </>
-        ) : null}
-        <div className='list-file-container'>
-          {files.map((file, idx) => (
-            <div key={idx} className='file-item'>
-              <img src={file.preview} alt='' width={100} height={100} />
-              <button className='btn-close' onClick={() => removeFile(idx)}>
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
-              {/* <p className='file-name'>{file.name}</p> */}
-            </div>
-          ))}
-        </div>
-      </section>
-    </form>
+        )
+      }
+    ])
+  }
+
+  return (
+    <>
+      <form onSubmit={handleSubmit} className='container'>
+        <section {...getRootProps({ className: className })}>
+          <input {...getInputProps()} />
+          <div className='upload-container'>
+            <FontAwesomeIcon className='upload-icon' icon={faCloudArrowUp} />
+            {isDragActive ? <p>Drop the files here ...</p> : <p>Drag & drop files here, or click to select files</p>}
+          </div>
+        </section>
+
+        {csvData && <ReactTable data={csvData} tableHooks={tableHooks} columns={headerConfig} />}
+      </form>
+      {files.length > 0 && <PreviewImages files={files} removeFile={removeFile} removeAll={removeAll} />}
+    </>
   )
 }
